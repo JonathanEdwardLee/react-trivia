@@ -8,6 +8,9 @@ const App = () => {
   const [score, setScore] = useState(0);
   const [highScores, setHighScores] = useState([]);
   const [initials, setInitials] = useState('');
+  const [category, setCategory] = useState("All");
+  const [screen, setScreen] = useState("start");
+  const [isHighScore, setIsHighScore] = useState(false);
 
   useEffect(() => {
     const savedScores = localStorage.getItem('highScores');
@@ -19,50 +22,173 @@ const App = () => {
   }, [highScores]);
 
   const questionsData = [
+    // Scales
     {
-      question: "What are the notes of the C major scale?",
-      options: ["C, D, E, F, G, A, B", "C, D, F, G, A, B, C", "C, D, E, G, A, B, C"],
-      answer: "C, D, E, F, G, A, B",
+      category: "Scales",
+      question: "What are the notes of the G major scale?",
+      options: ["G, A, B, C, D, E, F#", "G, A, B, C, D, E, F", "G, A, B, C, D, E, G"],
+      answer: "G, A, B, C, D, E, F#",
     },
-    // Add more questions here
+    {
+      category: "Scales",
+      question: "What is the pattern of whole and half steps in a major scale?",
+      options: ["Whole, Whole, Half, Whole, Whole, Whole, Half", "Whole, Half, Whole, Whole, Half, Whole, Whole", "Whole, Whole, Whole, Half, Whole, Whole, Half"],
+      answer: "Whole, Whole, Half, Whole, Whole, Whole, Half",
+    },
+    // Modes
+    {
+      category: "Modes",
+      question: "Which mode is often associated with a 'minor' sound but has a major sixth?",
+      options: ["Dorian", "Phrygian", "Mixolydian"],
+      answer: "Dorian",
+    },
+    {
+      category: "Modes",
+      question: "Name the notes in the D Dorian mode.",
+      options: ["D, E, F, G, A, B, C", "D, E, F#, G, A, B, C#", "D, E, F, G, A, Bb, C"],
+      answer: "D, E, F, G, A, B, C",
+    },
+    // Chords
+    {
+      category: "Chords",
+      question: "What notes make up a C major chord?",
+      options: ["C, E, G", "C, D, E", "C, F, G"],
+      answer: "C, E, G",
+    },
+    {
+      category: "Chords",
+      question: "What is the chord for G minor?",
+      options: ["Gmin", "Gmaj", "Gdim", "Gaug"],
+      answer: "Gmin",
+    },
+    // Harmony
+    {
+      category: "Harmony",
+      question: "What is the I-IV-V progression in the key of C?",
+      options: ["C-F-G", "C-D-E", "C-G-F"],
+      answer: "C-F-G",
+    },
+    {
+      category: "Harmony",
+      question: "What is a secondary dominant chord?",
+      options: ["A dominant chord that resolves to a diatonic chord other than the tonic", "A minor chord that resolves to the tonic", "A diminished chord that resolves to the tonic"],
+      answer: "A dominant chord that resolves to a diatonic chord other than the tonic",
+    },
   ];
 
   useEffect(() => {
-    setQuestions(questionsData);
-  }, []);
+    const filteredQuestions = category === "All" 
+      ? questionsData 
+      : questionsData.filter(q => q.category === category);
+    setQuestions(filteredQuestions);
+  }, [category]);
 
   const handleAnswer = (answer) => {
+    let newScore = score;
     if (answer === questions[currentQuestionIndex].answer) {
-      setScore(score + 1);
+      newScore += 1;
+      setScore(newScore);
     }
     if (currentQuestionIndex + 1 < questions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       const date = new Date().toLocaleString();
-      setHighScores([...highScores, { date, score }]);
-      setCurrentQuestionIndex(0);
-      setScore(0);
+      const updatedScores = [...highScores, { date, score: newScore }]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3);
+      setHighScores(updatedScores);
+      setScreen("end");
+      setIsHighScore(true);
     }
+  };
+
+  const handleSubmitInitials = () => {
+    const date = new Date().toLocaleString();
+    const newScore = { date, score, initials };
+    const updatedScores = [...highScores, newScore]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+    setHighScores(updatedScores);
+    setIsHighScore(false);
+    setInitials('');
+  };
+
+  const startGame = (category) => {
+    setCategory(category);
+    setScore(0);
+    setCurrentQuestionIndex(0);
+    setScreen("game");
+    setIsHighScore(false);
+  };
+
+  const resetGame = () => {
+    setCategory("All");
+    setScore(0);
+    setCurrentQuestionIndex(0);
+    setScreen("start");
   };
 
   return (
     <div className="app">
       <h1>Music Theory Trivia Game</h1>
-      {questions.length > 0 && (
+      
+      {screen === "start" && (
+        <div className="question-card">
+          <h2>Welcome to Music Theory Trivia!</h2>
+          <p>Choose a category below to begin:</p>
+          <button onClick={() => startGame("Scales")}>Scales</button>
+          <button onClick={() => startGame("Modes")}>Modes</button>
+          <button onClick={() => startGame("Chords")}>Chords</button>
+          <button onClick={() => startGame("Harmony")}>Harmony</button>
+          <button onClick={() => startGame("All")}>All Topics</button>
+        </div>
+      )}
+
+      {screen === "game" && questions.length > 0 && (
         <QuestionCard
           question={questions[currentQuestionIndex]}
           onAnswer={handleAnswer}
         />
       )}
-      <h2>Score: {score}</h2>
-      <h2>High Scores</h2>
-      <ul>
-        {highScores.map((scoreEntry, index) => (
-          <li key={index}>
-            {scoreEntry.date}: {scoreEntry.score}
-          </li>
-        ))}
-      </ul>
+
+      {screen === "end" && (
+        <div className="question-card">
+          <h2>Congrats, you did it!</h2>
+          <p>Would you like to try again? Please choose a category:</p>
+          <button onClick={() => startGame("Scales")}>Scales</button>
+          <button onClick={() => startGame("Modes")}>Modes</button>
+          <button onClick={() => startGame("Chords")}>Chords</button>
+          <button onClick={() => startGame("Harmony")}>Harmony</button>
+          <button onClick={() => startGame("All")}>All Topics</button>
+        </div>
+      )}
+
+      {isHighScore && (
+        <div className="high-score-input">
+          <h2>New High Score!</h2>
+          <input
+            type="text"
+            value={initials}
+            onChange={(e) => setInitials(e.target.value.toUpperCase().slice(0, 3))}
+            maxLength="3"
+            placeholder="Enter initials"
+          />
+          <button onClick={handleSubmitInitials}>Submit</button>
+        </div>
+      )}
+
+      <div className="footer">
+        <h2>Current Score: {score}</h2>
+        <h2>Personal High Scores</h2>
+        <ul>
+          {highScores.map((scoreEntry, index) => (
+            <li key={index}>
+              {scoreEntry.date}: {scoreEntry.score}
+            </li>
+          ))}
+        </ul>
+        <button onClick={resetGame}>Start Over?</button>
+      </div>
     </div>
   );
 };
