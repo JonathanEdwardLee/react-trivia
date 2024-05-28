@@ -2,17 +2,24 @@ body {
   font-family: 'Special Elite', sans-serif;
   background-color: black;
   color: white;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .app {
   text-align: center;
-  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  margin: 20px auto;
 }
 
 .question-card {
   background-color: rgba(255, 255, 255, 0.2);
-  padding: 20px;
-  margin: 20px;
+  padding: 50px;
+  margin: 20px 0;
   border-radius: 5px;
 }
 
@@ -24,6 +31,7 @@ button {
   margin: 5px;
   cursor: pointer;
   font-family: 'Special Elite', sans-serif;
+  border-radius: 5px;
 }
 
 button:hover {
@@ -38,16 +46,30 @@ ul {
 
 li {
   background-color: grey;
-  margin: 5px;
+  margin: 5px 0;
   padding: 10px;
   border-radius: 5px;
   font-family: 'Special Elite', sans-serif;
 }
 
+.footer {
+  text-align: center;
+  margin: 20px 0;
+}
+
 .high-score-input {
   background-color: rgba(255, 255, 255, 0.2);
   padding: 20px;
-  margin: 20px;
+  margin: 20px 0;
   border-radius: 5px;
 }
 
+.question-card h2 {
+  margin-bottom: 80px;
+}
+
+.question-card .options {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

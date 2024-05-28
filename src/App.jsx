@@ -10,7 +10,7 @@ const App = () => {
   const [initials, setInitials] = useState('');
   const [category, setCategory] = useState("All");
   const [screen, setScreen] = useState("start");
-  const [isHighScore, setIsHighScore] = useState(false);
+
 
   useEffect(() => {
     const savedScores = localStorage.getItem('highScores');
@@ -163,19 +163,8 @@ const App = () => {
         </div>
       )}
 
-      {isHighScore && (
-        <div className="high-score-input">
-          <h2>New High Score!</h2>
-          <input
-            type="text"
-            value={initials}
-            onChange={(e) => setInitials(e.target.value.toUpperCase().slice(0, 3))}
-            maxLength="3"
-            placeholder="Enter initials"
-          />
-          <button onClick={handleSubmitInitials}>Submit</button>
-        </div>
-      )}
+      
+     
 
       <div className="footer">
         <h2>Current Score: {score}</h2>
