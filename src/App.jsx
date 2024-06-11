@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import QuestionCard from './components/QuestionCard';
+import AnswerCard from './components/AnswerCard';
 
 const App = () => {
   const [questions, setQuestions] = useState([]);
@@ -10,7 +11,7 @@ const App = () => {
   const [initials, setInitials] = useState('');
   const [category, setCategory] = useState("All");
   const [screen, setScreen] = useState("start");
-
+  const [userAnswer, setUserAnswer] = useState('');
 
   useEffect(() => {
     const savedScores = localStorage.getItem('highScores');
@@ -338,33 +339,32 @@ const App = () => {
   }, [category]);
 
   const handleAnswer = (answer) => {
-    let newScore = score;
+    setUserAnswer(answer);
     if (answer === questions[currentQuestionIndex].answer) {
-      newScore += 1;
-      setScore(newScore);
+      setScore(score + 1);
     }
+    setScreen("answer");
+  };
+
+  const handleNext = () => {
     if (currentQuestionIndex + 1 < questions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setScreen("game");
     } else {
       const date = new Date().toLocaleString();
-      const updatedScores = [...highScores, { date, score: newScore }]
+      const updatedScores = [...highScores, { date, score }]
         .sort((a, b) => b.score - a.score)
         .slice(0, 3);
       setHighScores(updatedScores);
       setScreen("end");
-      setIsHighScore(true);
     }
   };
 
-  const handleSubmitInitials = () => {
-    const date = new Date().toLocaleString();
-    const newScore = { date, score, initials };
-    const updatedScores = [...highScores, newScore]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
-    setHighScores(updatedScores);
-    setIsHighScore(false);
-    setInitials('');
+  const handlePrevious = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setScreen("game");
+    }
   };
 
   const startGame = (category) => {
@@ -372,7 +372,6 @@ const App = () => {
     setScore(0);
     setCurrentQuestionIndex(0);
     setScreen("game");
-    setIsHighScore(false);
   };
 
   const resetGame = () => {
@@ -405,6 +404,15 @@ const App = () => {
         />
       )}
 
+      {screen === "answer" && questions.length > 0 && (
+        <AnswerCard
+          question={questions[currentQuestionIndex]}
+          userAnswer={userAnswer}
+          onNext={handleNext}
+          onPrevious={handlePrevious}
+        />
+      )}
+
       {screen === "end" && (
         <div className="question-card">
           <h2>Congrats, you did it!</h2>
@@ -416,9 +424,6 @@ const App = () => {
           <button onClick={() => startGame("All")}>All Topics</button>
         </div>
       )}
-
-      
-     
 
       <div className="footer">
         <h2>Current Score: {score}</h2>
