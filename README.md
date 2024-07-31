@@ -4,7 +4,7 @@
 
 This project is a Music Theory Trivia Game built with React. The game allows users to select from different categories of music theory questions, test their knowledge, view their score, and see their personal high scores. The game is designed to provide feedback on each answer and supports navigation between questions.
 
-[Watch a walkthrough of the game in action](https://www.loom.com/share/c3d07995f8d04becb90b5e805bf32ce3)
+Walkthrough of the game in action https://www.loom.com/share/c3d07995f8d04becb90b5e805bf32ce3
 
 ## Features
 
